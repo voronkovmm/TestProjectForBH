@@ -1,6 +1,4 @@
 using Mirror;
-using System.Xml.Serialization;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -27,6 +25,7 @@ public class Player : NetworkBehaviour
     #region Components
     public CharacterController CharacterController { get; private set; }
     public Camera Camera { get => _camera; private set => _camera = value; }
+    public PlayerNetworkController PlayerNetworkController { get; private set; }
 
     [Header("Components")]
     [SerializeField] private Camera _camera;
@@ -38,12 +37,13 @@ public class Player : NetworkBehaviour
 
     #endregion
 
-
     private void Awake()
     {
         CharacterController = GetComponent<CharacterController>();
 
         PlayerController = new PlayerController(this);
+
+        PlayerNetworkController = GetComponent<PlayerNetworkController>();
     }
 
     private void Update()

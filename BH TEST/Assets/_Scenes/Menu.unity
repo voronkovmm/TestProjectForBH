@@ -2962,28 +2962,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 7695787615642881802, guid: 52661ca05f8490b4db72be6595407c5c,
-        type: 3}
-      propertyPath: autoConnectClientBuild
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7695787615642881802, guid: 52661ca05f8490b4db72be6595407c5c,
-        type: 3}
-      propertyPath: spawnPrefabs.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7695787615642881802, guid: 52661ca05f8490b4db72be6595407c5c,
-        type: 3}
-      propertyPath: spawnPrefabs.Array.data[0]
-      value: 
-      objectReference: {fileID: 4303452473396792954, guid: 4a38809695ac112499bada3c17ba2ced,
-        type: 3}
-    - target: {fileID: 7695787615642881802, guid: 52661ca05f8490b4db72be6595407c5c,
-        type: 3}
-      propertyPath: spawnPrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 3098839018124804038, guid: 19affcbe6dbe8224b93cfc6438396f17,
-        type: 3}
     - target: {fileID: 7695787615642881803, guid: 52661ca05f8490b4db72be6595407c5c,
         type: 3}
       propertyPath: m_RootOrder
@@ -3047,7 +3025,7 @@ PrefabInstance:
     - target: {fileID: 7695787615642881909, guid: 52661ca05f8490b4db72be6595407c5c,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 52661ca05f8490b4db72be6595407c5c, type: 3}

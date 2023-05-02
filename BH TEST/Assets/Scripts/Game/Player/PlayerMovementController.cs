@@ -30,11 +30,8 @@ public class PlayerMovementController
             Dash();
     }
 
-    private void GetMovementInputUser()
-    {
-        _moveInputUser = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-    }
-    
+    private void GetMovementInputUser() => _moveInputUser = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+
     private void GetDashInputUser()
     {
         if (Input.GetMouseButtonDown(0))

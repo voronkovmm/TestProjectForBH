@@ -40,8 +40,6 @@ public class Menu : MonoBehaviour
         else
             NetworkManager.singleton.networkAddress = ip;
 
-        Debug.Log($"{NetworkManager.singleton.networkAddress}");
-
         NetworkManager.singleton.StartClient();
     }
 

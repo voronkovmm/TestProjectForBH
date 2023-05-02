@@ -8,7 +8,7 @@ public class PlayerController
     public PlayerController(Player player)
     {
         MovementController = new PlayerMovementController(player);
-        _visibilityController = new PlayerVisibilityController(player);
+        _visibilityController = new PlayerVisibilityController(player);        
     }
     public void Update()
     {

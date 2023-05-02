@@ -11,13 +11,13 @@ class MenuJoinHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        NetworkManagerMenu.OnClientDisconnected += OnFailedToConnect;
-        NetworkManagerMenu.OnClientConnected += OnSuccessToConnect;
+        GameNetworkManager.OnClientDisconnected += OnFailedToConnect;
+        GameNetworkManager.OnClientConnected += OnSuccessToConnect;
     }
     private void OnDisable()
     {
-        NetworkManagerMenu.OnClientDisconnected -= OnFailedToConnect;
-        NetworkManagerMenu.OnClientConnected -= OnSuccessToConnect;
+        GameNetworkManager.OnClientDisconnected -= OnFailedToConnect;
+        GameNetworkManager.OnClientConnected -= OnSuccessToConnect;
     }
 
     private void OnFailedToConnect() => StartCoroutine(ShowMessageFailedToJoinGame());

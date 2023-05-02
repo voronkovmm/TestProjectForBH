@@ -1,5 +1,4 @@
 using Mirror;
-using System;
 using TMPro;
 
 public class DebugText : NetworkBehaviour
@@ -22,16 +21,8 @@ public class DebugText : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void Print(string message, string from)
-    {        
-        SuperPrint(message, from);
-    }
+    public void SendPrintToServer(string message, string from) => PrintAll(message, from);
 
     [ClientRpc]
-    private void SuperPrint(string message, string from)
-    {
-        _tmp.text += $"\n{from}{message}";
-    }
-
-    //DebugText.Instance.Print("hello", isClientOnly? "клиент: " : "сервер: ");
+    private void PrintAll(string message, string from) => _tmp.text += $"\n{from}: {message}";
 }
