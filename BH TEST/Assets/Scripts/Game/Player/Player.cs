@@ -4,20 +4,24 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class Player : NetworkBehaviour
 {
+    [SyncVar(hook = nameof(SetName))]
+    public string Name;
+
     #region States
     [Header("States")]
     [SerializeField] private float _moveSpeed = 5;
     [SerializeField] private float _visibilitySensivity = 100;
     [SerializeField] private float _dashForce = 5;
     [SerializeField] private float _dashDistance = 0.5f;
-    [SerializeField] private float _durationColorChangeWhenTouchedDash = 3;
+    [SerializeField] private double _durationColorChangeWhenTouchedDash = 3;
     [SerializeField] private AnimationCurve _dashCurve;
+
 
     public float MoveSpeed { get => _moveSpeed; private set => _moveSpeed = value; }
     public float VisibilitySensivity { get => _visibilitySensivity; private set => _visibilitySensivity = value; }
     public float DashForce { get => _dashForce; private set => _dashForce = value; }
     public float DashDistance { get => _dashDistance; private set => _dashDistance = value; }
-    public float DurationColorChangeWhenTouchedDash { get => _durationColorChangeWhenTouchedDash; private set => _durationColorChangeWhenTouchedDash = value; }
+    public double DurationColorChangeWhenTouchedDash { get => _durationColorChangeWhenTouchedDash; private set => _durationColorChangeWhenTouchedDash = value; }
     public AnimationCurve DashCurve { get => _dashCurve; private set => _dashCurve = value; }
 
     #endregion
@@ -59,4 +63,6 @@ public class Player : NetworkBehaviour
 
         PlayerController.LateUpdate();
     }
+
+    private void SetName(string oldName, string newName) => Name = newName;
 }

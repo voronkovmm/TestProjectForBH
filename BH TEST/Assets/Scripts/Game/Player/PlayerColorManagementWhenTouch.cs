@@ -5,15 +5,15 @@ using UnityEngine;
 public class PlayerColorManagementWhenTouch : NetworkBehaviour
 {
     [SyncVar(hook = "OnIsTouch")]
-    private bool _iWasTouched;
-    private float _timerColorReturn = 0;
+    private bool IsWasTouched;
+    private double _timerColorReturn = 0;
 
     private Player _player;
     private Renderer _playerRenderer;
     [SerializeField] private Material _playerNormalMaterial;
     [SerializeField] private Material _playerDashTouchMaterial;
 
-    public static event Action<int> OnPlayerWasTouched;
+    public static event Action<string> OnPlayerWasTouched;
 
     private void Awake()
     {
@@ -31,30 +31,27 @@ public class PlayerColorManagementWhenTouch : NetworkBehaviour
 
         if (_timerColorReturn > 0)
         {
-            _timerColorReturn -= Time.deltaTime;
-            if (_timerColorReturn < 0)
+            if (_timerColorReturn < NetworkTime.localTime)
             {
-                ReturnColorGreen();
+                CmdReturnColorGreen();
             }
         }
     }
     
     private void TryTouchPlayerInDash(ControllerColliderHit hit)
     {
-        if (_player.PlayerController.MovementController.IsDash && hit.collider.TryGetComponent(out PlayerColorManagementWhenTouch playerColliderController))
-        {
-            playerColliderController.ApplyTouchFromPlayer();
-        }
+        if (_player.PlayerController.MovementController.IsDash && hit.collider.TryGetComponent(out PlayerColorManagementWhenTouch target))
+            CmdTouchPlayer(target, _player.Name);
     }
 
-    [Command(requiresAuthority = false)]
-    private void ApplyTouchFromPlayer()
+    [Command]
+    private void CmdTouchPlayer(PlayerColorManagementWhenTouch target, string nameWhoTouched)
     {
-        if (_iWasTouched) return;
-        //DebugText.Instance.Print($"isLocalPlayer {isLocalPlayer}, isServer {isServer}, isClient {isClient}, isClientOnly {isClientOnly}, ", isClientOnly ? "клиент: " : "сервер: ");
-        OnPlayerWasTouched?.Invoke(isLocalPlayer ? 0 : 1);
+        if (target.IsWasTouched) return;
+        
+        OnPlayerWasTouched?.Invoke(nameWhoTouched);
 
-        _iWasTouched = true;
+        target.IsWasTouched = true;
     }
 
     private void OnIsTouch(bool oldValue, bool newValue)
@@ -62,14 +59,17 @@ public class PlayerColorManagementWhenTouch : NetworkBehaviour
         if (newValue == true)
         {
             _playerRenderer.material = _playerDashTouchMaterial;
-            _timerColorReturn = _player.DurationColorChangeWhenTouchedDash;
+            
+            _timerColorReturn = _player.DurationColorChangeWhenTouchedDash + NetworkTime.localTime;
         }
         else
         {
             _playerRenderer.material = _playerNormalMaterial;
+
+            _timerColorReturn = 0;
         }
     }
 
     [Command]
-    private void ReturnColorGreen() => _iWasTouched = false;
+    private void CmdReturnColorGreen() => IsWasTouched = false;
 }

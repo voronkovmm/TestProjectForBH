@@ -1,74 +1,77 @@
 using Mirror;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class ScoreTouches : NetworkBehaviour
 {
-    public static ScoreTouches Instance;
-
+    private const int POINTS_TO_WIN = 3;
     private int _timeToRestartLvl = 5;
-
-    public const int HOST = 0;
-    public const int CLIENT = 1;
-    public const string CLIENT_NAME = "Клиент";
-    public const string SERVER_NAME = "Сервер";
-
-    private bool _isGameOver;
-
-    [SyncVar(hook = nameof(OnSetScoreHost))]
-    private int _scoreHostPlayer;
-    [SyncVar(hook = nameof(OnSetScoreClient))]
-    private int _scoreClientPlayer;
-
+    private bool _isGameOver;    
+    private readonly SyncDictionary<string, int> _scorePlayers = new();
+    private StringBuilder _sb = new();
     [SerializeField] private TMP_Text _tmpScore;
 
-    private void Awake()
+    private void Start()
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(this);
+        CmdFillPlayers();
+        CmdUpdateScore();
     }
 
-    private void Start() => CmdUpdateScore();
+    private void OnEnable() => PlayerColorManagementWhenTouch.OnPlayerWasTouched += CmdAddScore;
 
-    private void OnEnable() => PlayerColorManagementWhenTouch.OnPlayerWasTouched += RpcAddScore;
+    private void OnDisable() => PlayerColorManagementWhenTouch.OnPlayerWasTouched -= CmdAddScore;
 
-    private void OnDisable() => PlayerColorManagementWhenTouch.OnPlayerWasTouched -= RpcAddScore;
-
-    [Server]
-    [ClientRpc]
-    private void RpcAddScore(int playerWhoWasTouched)
+    [Command(requiresAuthority = false)]
+    private void CmdFillPlayers()
     {
-        if (_isGameOver) return;
+        List<Player> players = CustomNetworkManager.Singleton._listPlayers.Players;
 
-        switch (playerWhoWasTouched)
+        for (int i = 0; i < players.Count; i++)
         {
-            case HOST:
-                _scoreClientPlayer++; break;
-            case CLIENT:
-                _scoreHostPlayer++; break;
-        }
+            if (_scorePlayers.ContainsKey(players[i].Name))
+                continue;
 
-        _tmpScore.text = $"{SERVER_NAME} {_scoreHostPlayer} : {_scoreClientPlayer} {CLIENT_NAME}";
-
-        if(_scoreClientPlayer == 3 || _scoreHostPlayer == 3)
-        {
-            StartCoroutine(ShowWinWindowAndRestartLvl(_scoreClientPlayer == 3 ? CLIENT_NAME : SERVER_NAME));
-            _isGameOver = true;
+            _scorePlayers.Add(players[i].Name, 0);
         }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdUpdateScore() => RpcUpdateScore();
+    private void CmdAddScore(string nameWhoTouched)
+    {
+        if (_isGameOver) return;
+
+        _scorePlayers[nameWhoTouched] += 1;
+
+        if (_scorePlayers[nameWhoTouched] == POINTS_TO_WIN)
+        {
+            _isGameOver = true;
+            RpcShowTextWictoryAndRestartLvl(nameWhoTouched);
+            return;
+        }
+
+        CmdUpdateScore();
+    }
+
+    [Command(requiresAuthority = false)]
+    private void CmdUpdateScore()
+    {
+        foreach (var player in _scorePlayers)
+        {
+            _sb.Append($"\n{player.Key} - {player.Value}");
+        }
+
+        RpcShowScorePlayers(_sb.ToString());
+        _sb.Clear();
+    }
 
     [ClientRpc]
-    public void RpcUpdateScore() => _tmpScore.text = $"{SERVER_NAME} {_scoreHostPlayer} : {_scoreClientPlayer} {CLIENT_NAME}";
+    private void RpcShowScorePlayers(string text) => _tmpScore.text = text;
 
-    private void OnSetScoreHost(int oldValue, int newValue) => _scoreHostPlayer = newValue;
-
-    private void OnSetScoreClient(int oldValue, int newValue) => _scoreClientPlayer = newValue;
+    [ClientRpc]
+    private void RpcShowTextWictoryAndRestartLvl(string nameOfWinner) => StartCoroutine(ShowWinWindowAndRestartLvl(nameOfWinner));
 
     private IEnumerator ShowWinWindowAndRestartLvl(string nameOfWinner)
     {
@@ -84,7 +87,7 @@ public class ScoreTouches : NetworkBehaviour
 
             timeBeforeToRestartLvl--;
 
-            if(timeBeforeToRestartLvl == 0)
+            if (timeBeforeToRestartLvl == 0)
             {
                 NetworkManager.singleton.ServerChangeScene(SceneNames.GAME);
             }

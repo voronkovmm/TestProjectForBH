@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class LobbiWaitingForPlayers : NetworkBehaviour
 {
-    private readonly string WAITING_GAME = "Ожидание игроков";
-    private readonly string GAME_READY = "Ожидание старта игры";
+    private const string WAITING_GAME = "Ожидание игроков";
+    private const string GAME_READY = "Ожидание старта игры";
 
     #region Components
     [SerializeField] private Button _startGame;
@@ -35,7 +35,7 @@ public class LobbiWaitingForPlayers : NetworkBehaviour
                 _waitingForPlayersGameObject.SetActive(false);
                 _startGame.gameObject.SetActive(true);
 
-                RpcNotifyClients(isGameReady: true);
+                RpcUpdateGameReadinessText(isGameReady: true);
             }
         }
         else
@@ -45,13 +45,13 @@ public class LobbiWaitingForPlayers : NetworkBehaviour
                 _waitingForPlayersGameObject.SetActive(true);
                 _startGame.gameObject.SetActive(false);
 
-                RpcNotifyClients(isGameReady: false);
+                RpcUpdateGameReadinessText(isGameReady: false);
             }
         }
     }
 
     [ClientRpc]
-    private void RpcNotifyClients(bool isGameReady)
+    private void RpcUpdateGameReadinessText(bool isGameReady)
     {
         if (isClientOnly)
         {
